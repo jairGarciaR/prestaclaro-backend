@@ -9,6 +9,26 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  email       String        @unique
+  name        String
+  createdAt   DateTime      @default(now())
+  simulations Simulation[]
+}
+
+model Simulation {
+  id           Int       @id @default(autoincrement())
+  amount       Float
+  months       Int
+  monthlyFee   Float
+  totalToPay   Float
+  createdAt    DateTime  @default(now())
+
+  user         User      @relation(fields: [userId], references: [id])
+  userId       Int
 }
