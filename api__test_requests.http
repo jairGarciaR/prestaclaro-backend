@@ -1,0 +1,68 @@
+### 🟢 REGISTRO DE USUARIO
+POST http://localhost:3000/api/usuario
+Content-Type: application/json
+
+{
+  "name": "Juan Pérez",
+  "email": "juan@email.com",
+  "telefono": "5511223345",
+  "password": "juan123"
+}
+
+### 🟢 LOGIN DE USUARIO
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "juan@email.com",
+  "password": "juan123"
+}
+
+### 🟢 DATOS DEL USUARIO AUTENTICADO (requiere token)
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImVtYWlsIjoianVhbkBlbWFpbC5jb20iLCJuYW1lIjoiSnVhbiBQw6lyZXoiLCJpYXQiOjE3NDQyNDg4OTIsImV4cCI6MTc0NDI1NjA5Mn0.K_jzmG2c_3BANwPk9Ro0bWm-B-YkYlir3EBr029DpC0
+
+### 🟢 OBTENER USUARIO POR ID
+GET http://localhost:3000/api/usuario/1
+
+### 🟡 ACTUALIZAR USUARIO
+PUT http://localhost:3000/api/usuario/1
+Content-Type: application/json
+
+{
+  "name": "Jair Admin",
+  "email" : "jairadmin@email.com",
+  "telefono": "4747470101",
+  "password": "admin123"
+}
+
+### 🔴 ELIMINAR USUARIO
+DELETE http://localhost:3000/api/usuario/4
+
+### 🟢 CREAR SIMULACIÓN
+POST http://localhost:3000/api/simulador
+Content-Type: application/json
+
+{
+  "amount": 10000,
+  "months": 12,
+  "userId": 1
+}
+
+### 🟢 LISTAR SIMULACIONES DE USUARIO
+GET http://localhost:3000/api/simulaciones?userId=1
+
+### 🟢 OBTENER SIMULACIÓN POR ID
+GET http://localhost:3000/api/simulaciones/1
+
+### 🟡 ACTUALIZAR SIMULACIÓN
+PUT http://localhost:3000/api/simulaciones/1
+Content-Type: application/json
+
+{
+  "amount": 15000,
+  "months": 10
+}
+
+### 🔴 ELIMINAR SIMULACIÓN
+DELETE http://localhost:3000/api/simulaciones/1

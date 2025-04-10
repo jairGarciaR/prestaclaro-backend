@@ -1,13 +1,6 @@
 // pages/api/simulador.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "../../lib/prisma";
-import { calcularCuota } from "../..//lib/calculos";
-
-type SimuladorRequest = {
-  amount: number;
-  months: number;
-  userId: number;
-};
+import { createSimulation } from "@/controllers/simulation.controller";
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,27 +10,20 @@ export default async function handler(
     return res.status(405).json({ error: "Método no permitido" });
   }
 
-  const { amount, months, userId }: SimuladorRequest = req.body;
+  const { amount, months, userId } = req.body;
 
   if (!amount || !months || !userId) {
-    return res.status(400).json({ error: "Faltan campos obligatorios" });
+    return res.status(400).json({ error: "Faltan campos requeridos" });
   }
 
   try {
-    const { monthlyFee, totalToPay } = calcularCuota(amount, months);
-
-    const simulacion = await prisma.simulation.create({
-      data: {
-        amount,
-        months,
-        monthlyFee,
-        totalToPay,
-        user: { connect: { id: userId } },
-      },
-    });
-
+    const simulacion = await createSimulation(
+      Number(amount),
+      Number(months),
+      Number(userId)
+    );
     return res.status(201).json(simulacion);
-  } catch (err) {
-    return res.status(500).json({ error: "Error al guardar la simulación" });
+  } catch {
+    return res.status(500).json({ error: "Error al crear simulación" });
   }
 }

@@ -1,61 +1,58 @@
 // pages/api/simulaciones/[id].ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "../../../lib/prisma";
-import { calcularCuota } from "../../../lib/calculos";
+import {
+  getSimulationById,
+  updateSimulation,
+  deleteSimulation,
+} from "@/controllers/simulation.controller";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const simId = parseInt(req.query.id as string);
-
-  if (isNaN(simId)) {
+  const id = Number(req.query.id);
+  if (!id) {
     return res.status(400).json({ error: "ID inválido" });
   }
 
   try {
     switch (req.method) {
-      case "GET":
-        const simulacion = await prisma.simulation.findUnique({
-          where: { id: simId },
-        });
+      case "GET": {
+        const simulacion = await getSimulationById(id);
         if (!simulacion)
           return res.status(404).json({ error: "Simulación no encontrada" });
         return res.status(200).json(simulacion);
+      }
 
-      case "PUT":
+      case "PUT": {
         const { amount, months } = req.body;
         if (!amount || !months) {
-          return res
-            .status(400)
-            .json({ error: "Faltan campos: amount o months" });
+          return res.status(400).json({ error: "Faltan campos requeridos" });
         }
-
-        const { monthlyFee, totalToPay } = calcularCuota(amount, months);
-
-        const updated = await prisma.simulation.update({
-          where: { id: simId },
-          data: {
-            amount,
-            months,
-            monthlyFee,
-            totalToPay,
-          },
-        });
-
+        const updated = await updateSimulation(id, amount, months);
         return res.status(200).json(updated);
+      }
 
-      case "DELETE":
-        await prisma.simulation.delete({ where: { id: simId } });
-        return res.status(204).end();
+      case "DELETE": {
+        try {
+          await deleteSimulation(id);
+          return res.status(204).end();
+        } catch (err: any) {
+          if (err.code === "P2025") {
+            return res
+              .status(404)
+              .json({ error: "Simulación no encontrada o no existente" });
+          }
+          return res
+            .status(500)
+            .json({ error: "Error al eliminar simulación" });
+        }
+      }
 
       default:
-        res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
-        return res
-          .status(405)
-          .json({ error: `Método ${req.method} no permitido` });
+        return res.status(405).json({ error: "Método no permitido" });
     }
-  } catch (err) {
-    return res.status(500).json({ error: "Error al procesar la solicitud" });
+  } catch {
+    return res.status(500).json({ error: "Error en el servidor" });
   }
 }
