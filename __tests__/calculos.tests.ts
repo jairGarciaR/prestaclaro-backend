@@ -19,6 +19,8 @@ describe("calcularCuota", () => {
     const { totalToPay } = calcularCuota(amount, months);
 
     expect(new Decimal(totalToPay).toFixed(2)).toBe(totalEsperado.toFixed(2));
+    console.log("Cuota calculada:", cuota.toFixed(2));
+    console.log("Total esperado:", totalEsperado.toFixed(2));
   });
 
   it("redondea los valores a 2 decimales", () => {
