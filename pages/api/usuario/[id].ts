@@ -44,14 +44,25 @@ export default async function handler(
               .status(404)
               .json({ error: "Usuario no encontrado o no existente" });
           }
-          return res.status(500).json({ error: "Error al eliminar usuario" });
+          // log interno de eliminación
+          console.error("[API DELETE ERROR]", err);
+          return res
+            .status(500)
+            .json({ error: "Error al eliminar usuario", details: err.message });
         }
       }
 
       default:
         return res.status(405).json({ error: "Método no permitido" });
     }
-  } catch {
-    return res.status(500).json({ error: "Error en el servidor" });
+  } catch (err: any) {
+    // 1) Loguea el error completo en Railway logs
+    console.error("[API ERROR] /api/usuario/[id]:", err);
+    // 2) Devuelve el mensaje y stack para depurar desde Postman
+    return res.status(500).json({
+      error: "Error en el servidor",
+      message: err.message,
+      stack: err.stack,
+    });
   }
 }
